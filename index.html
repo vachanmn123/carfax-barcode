@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VIN Barcode Reader</title>
+  <style>
+    #scanner-popup {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      justify-content: center;
+      align-items: center;
+    }
+
+    #scanner {
+      width: 80%;
+      height: 80%;
+    }
+
+    #close-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: red;
+      color: white;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+    }
+  </style>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+  <script>eruda.init();</script>
+</head>
+
+<body>
+  <button id="open-scanner-btn">Scan VIN Barcode</button>
+
+  <div id="scanner-popup">
+    <button id="close-btn">Close</button>
+    <div id="scanner"></div>
+  </div>
+
+  <!-- Include QuaggaJS from CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+  <script>
+    const openScannerBtn = document.getElementById('open-scanner-btn');
+    const scannerPopup = document.getElementById('scanner-popup');
+    const closeBtn = document.getElementById('close-btn');
+    const scanner = document.getElementById('scanner');
+
+    openScannerBtn.addEventListener('click', () => {
+      scannerPopup.style.display = 'flex';
+      if (navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function') {
+        // safely access `navigator.mediaDevices.getUserMedia`
+        startScanner();
+      } else {
+        alert('Camera not supported');
+        scannerPopup.style.display = 'none';
+        return
+      }
+    });
+
+    closeBtn.addEventListener('click', () => {
+      stopScanner();
+      scannerPopup.style.display = 'none';
+    });
+
+    function startScanner() {
+      Quagga.init({
+        inputStream: {
+          name: "Live",
+          type: "LiveStream",
+          target: scanner,
+          constraints: {
+            facingMode: "environment" // Use the back camera
+          }
+        },
+        decoder: {
+          readers: ["code_128_reader"]
+        }
+      }, (err) => {
+        if (err) {
+          console.error(err);
+          return;
+        }
+        Quagga.start();
+      });
+
+      Quagga.onDetected((data) => {
+        const vin = data.codeResult.code;
+        console.log(`VIN Detected: ${vin}`, data);
+        alert(`VIN Detected: ${vin}`);
+        stopScanner();
+        scannerPopup.style.display = 'none';
+      });
+    }
+
+    function stopScanner() {
+      Quagga.stop();
+    }
+  </script>
+</body>
+
+</html>
