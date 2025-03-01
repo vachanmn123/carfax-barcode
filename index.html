@@ -97,9 +97,9 @@
       Quagga.onDetected((data) => {
         const vin = data.codeResult.code;
         console.log(`VIN Detected: ${vin}`, data);
+        stopScanner();
         alert(`VIN Detected: ${vin}`);
         document.getElementById('vin').value = vin;
-        stopScanner();
         scannerPopup.style.display = 'none';
       });
     }
