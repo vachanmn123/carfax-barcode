@@ -34,13 +34,13 @@
       cursor: pointer;
     }
   </style>
-
-
-  <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-  <script>eruda.init();</script>
 </head>
 
 <body>
+
+  <input type="text" id="vin" placeholder="VIN" />
+  <button id="submit-btn">Submit</button>
+  <br>
   <button id="open-scanner-btn">Scan VIN Barcode</button>
 
   <div id="scanner-popup">
@@ -98,6 +98,7 @@
         const vin = data.codeResult.code;
         console.log(`VIN Detected: ${vin}`, data);
         alert(`VIN Detected: ${vin}`);
+        document.getElementById('vin').value = vin;
         stopScanner();
         scannerPopup.style.display = 'none';
       });
